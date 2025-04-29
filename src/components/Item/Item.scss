@@ -1,0 +1,12 @@
+$primary: #b0f5c1;
+$secondary: #be7fe0;
+
+.card {
+  background-color: $primary !important;
+  margin: 10px !important;
+}
+
+.btn-info {
+  background-color: $secondary !important;
+  border-color: $secondary !important;
+}

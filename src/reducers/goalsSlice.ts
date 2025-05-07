@@ -2,7 +2,9 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { RootState } from "../store"
 
 interface Goal {
-    name: string
+    id: number;
+    name: string;
+    complete: boolean;
 }
 
 interface GoalsState {
@@ -12,22 +14,36 @@ interface GoalsState {
 const initialState: GoalsState = {
     value: [
         {
-            'name': 'Graduarme de la Universidad'
+            id: 1,
+            name: 'Graduarme de la Universidad',
+            complete: false
         }
     ],
 }
 
-export const todoSlice = createSlice({
+export const goalSlice = createSlice({
     name: 'goals',
     initialState,
     reducers: {
-        addGoal: (state, action: PayloadAction<Goal>) => {
-            state.value.push(action.payload)
+        addGoal: (state, action: PayloadAction<{ name: string }>) => {
+            state.value.push({
+                id: state.value.length + 1,
+                name: action.payload.name,
+                complete: false
+            })
+        },
+        removeGoal: (state, action: PayloadAction<number>) => {
+            state.value = state.value.filter((goal) => goal.id !== action.payload);
+        },
+        toggleGoal: (state, action: PayloadAction<number>) => {
+            const goal = state.value.find(goal => goal.id === action.payload);
+            if (goal) {
+                goal.complete = !goal.complete;
+            }
         }
     }
 })
-
-export const { addGoal } = todoSlice.actions
+export const { addGoal, removeGoal, toggleGoal } = goalSlice.actions
 export const selectGoals = (state: RootState) => state.goals.value
 
-export default todoSlice.reducer
+export default goalSlice.reducer

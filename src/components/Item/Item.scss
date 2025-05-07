@@ -1,12 +1,27 @@
-$primary: #b0f5c1;
-$secondary: #be7fe0;
+$body-bg: #000;
+$primary: #b4f9dc;
+$black: #000;
+$secondary: #b4f9dc;
+$third: #d1d5ff;
 
 .card {
-  background-color: $primary !important;
-  margin: 10px !important;
+  color: $black;
+  background-color: $primary;
+  margin-top: 30px;
 }
-
 .btn-info {
-  background-color: $secondary !important;
-  border-color: $secondary !important;
+  background-color: $third;
+  color: $black;
+  --bs-btn-border-color: $third;
+  width: fit-content;
+  margin-right: 10px;
+  margin-right: 10px;
+}
+.btn {
+  background-color: $third;
+  color: $black;
+}
+.border {
+  background-color: $third;
+  color: $black;
 }

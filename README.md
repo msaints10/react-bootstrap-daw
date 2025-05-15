@@ -1,23 +1,24 @@
 # Proyecto React Bootstrap DAW
 
-Esta es una plantilla de proyecto React utilizando Vite, TypeScript y React Bootstrap para el curso de desarrollo de aplicaciones web (DAW).
+Esta es una aplicación web completa que consta de un backend en Node.js y un frontend en React, utilizando TypeScript y React Bootstrap para el curso de desarrollo de aplicaciones web (DAW).
 
 ## Sobre el Proyecto
 
 Este proyecto proporciona una base para construir aplicaciones web modernas con:
 
-- React 19
-- TypeScript
+- Backend con Node.js y Express
+- Frontend con React 19 y TypeScript
 - Vite como herramienta de construcción
 - React Bootstrap para componentes de UI
 - Configuración de ESLint para calidad de código
 
-## Instalación
+## Backend
 
-1. Clonar el repositorio:
+### Instalación
+
+1. Navegar a la carpeta backend:
 ```bash
-git clone https://github.com/yourusername/react-bootstrap-daw.git
-cd react-bootstrap-daw
+cd backend
 ```
 
 2. Instalar dependencias:
@@ -25,7 +26,65 @@ cd react-bootstrap-daw
 npm install
 ```
 
-## Ejecutar el Proyecto
+3. Generar clave secreta:
+```bash
+cd utils
+node create_secretkey.js
+cd ..
+```
+
+### Ejecutar el Proyecto Backend
+
+Para iniciar el servidor de desarrollo:
+```bash
+npm run dev
+```
+
+Para iniciar en modo producción:
+```bash
+npm start
+```
+
+### Documentación de la API
+
+# Authorization
+
+Se debe de incluir el Authorization en el header de la petición. Debe ser igual al secret_key generado.
+
+# Endpoints disponibles
+- `GET /getTasks` - Obtiene todas las tareas
+- `GET /getGoals` - Obtiene todas las metas
+- `POST /addTask` - Añade una nueva tarea
+parametros body:
+  - `title`: Título de la tarea
+  - `dueDate`: Fecha de vencimiento de la tarea
+- `POST /addGoal` - Añade una nueva meta
+parametros body:
+  - `title`: Título de la tarea
+  - `dueDate`: Fecha de vencimiento de la tarea
+- `POST /removeTask/:id` - Elimina una tarea
+parametros head:
+  - `id`: ID de la tarea a eliminar
+- `POST /removeGoal/:id` - Elimina una meta
+parametros head:
+  - `id`: ID de la meta a eliminar
+- 
+
+## Frontend
+
+### Instalación
+
+1. Navegar a la carpeta frontend:
+```bash
+cd frontend
+```
+
+2. Instalar dependencias:
+```bash
+npm install
+```
+
+### Ejecutar el Proyecto Frontend
 
 Para iniciar el servidor de desarrollo:
 ```bash

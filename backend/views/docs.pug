@@ -1,0 +1,171 @@
+doctype html
+html(lang="es")
+    head
+        title API de Tareas y Metas
+        style.
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+            }
+            h1, h2 {
+                color: #333;
+                border-bottom: 2px solid #eee;
+                padding-bottom: 10px;
+            }
+            .endpoint {
+                background: #f5f5f5;
+                padding: 15px;
+                margin: 10px 0;
+                border-radius: 5px;
+            }
+            .method {
+                font-weight: bold;
+                color: #0066cc;
+            }
+            .path {
+                color: #666;
+                font-family: monospace;
+            }
+            .description {
+                margin-top: 5px;
+                color: #444;
+            }
+            .response-codes {
+                margin-top: 10px;
+                font-size: 0.9em;
+            }
+            .code-200 { color: #2da44e; }
+            .code-400 { color: #d93f0e; }
+            .code-401 { color: #bf8700; }
+            .code-500 { color: #cf222e; }
+    body
+        h1 API de Tareas y Metas
+        p Esta API permite gestionar tareas y metas de manera eficiente.
+        
+        h2 Endpoints Disponibles
+        
+        .endpoint
+            span.method GET
+            span.path  /tasks/getTasks
+            p.description Obtiene todas las tareas almacenadas
+            .response-codes
+                p
+                    span.code-200 200: 
+                    span Éxito - Retorna lista de tareas
+                    br
+                    span.code-400 400: 
+                    span Error - Parámetros incorrectos
+                    br
+                    span.code-401 401: 
+                    span No autorizado
+                    br
+                    span.code-500 500: 
+                    span Error del servidor
+        
+        .endpoint
+            span.method POST
+            span.path  /tasks/addTask
+            p.description Añade una nueva tarea
+            p.parameters Parámetros requeridos:
+            br
+            | - title: String (título de la tarea)
+            br
+            | - dueDate: Date (fecha límite)
+            .response-codes
+            p
+                span.code-200 200: 
+                span Éxito - Tarea creada
+                br
+                span.code-400 400: 
+                span Error - Parámetros incorrectos
+                br
+                span.code-401 401: 
+                span No autorizado
+                br
+                span.code-500 500: 
+                span Error del servidor
+        
+        .endpoint
+            span.method DELETE
+            span.path  /tasks/removeTask/:id
+            p.description Elimina una tarea específica por su ID
+            .response-codes
+                p
+                    span.code-200 200: 
+                    span Éxito - Tarea eliminada
+                    br
+                    span.code-400 400: 
+                    span Error - Parámetros incorrectos
+                    br
+                    span.code-401 401: 
+                    span No autorizado
+                    br
+                    span.code-500 500: 
+                    span Error del servidor
+
+        .endpoint
+            span.method GET
+            span.path  /goals/getGoals
+            p.description Obtiene todas las metas almacenadas
+            .response-codes
+                p
+                    span.code-200 200: 
+                    span Éxito - Retorna lista de metas
+                    br
+                    span.code-400 400: 
+                    span Error - Parámetros incorrectos
+                    br
+                    span.code-401 401: 
+                    span No autorizado
+                    br
+                    span.code-500 500: 
+                    span Error del servidor
+        
+        .endpoint
+            span.method POST
+            span.path  /goals/addGoal
+            p.description Añade una nueva meta
+            p.parameters Parámetros requeridos:
+            br
+            | - title: String (título de la meta)
+            br
+            | - dueDate: Date (fecha límite)
+            .response-codes
+            p
+                span.code-200 200: 
+                span Éxito - Meta creada
+                br
+                span.code-400 400: 
+                span Error - Parámetros incorrectos
+                br
+                span.code-401 401: 
+                span No autorizado
+                br
+                span.code-500 500: 
+                span Error del servidor
+        
+        .endpoint
+            span.method DELETE
+            span.path  /goals/removeGoal/:id
+            p.description Elimina una meta específica por su ID
+            .response-codes
+                p
+                    span.code-200 200: 
+                    span Éxito - Meta eliminada
+                    br
+                    span.code-400 400: 
+                    span Error - Parámetros incorrectos
+                    br
+                    span.code-401 401: 
+                    span No autorizado
+                    br
+                    span.code-500 500: 
+                    span Error del servidor
+        
+        h2 Autenticación
+        p Todas las rutas (excepto la documentación) requieren una clave API en el encabezado Authorization
+        .endpoint
+            p.description Ejemplo de encabezado:
+            pre Authorization: tu-api-key

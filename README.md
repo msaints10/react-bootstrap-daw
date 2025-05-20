@@ -52,23 +52,22 @@ npm start
 Se debe de incluir el Authorization en el header de la petición. Debe ser igual al secret_key generado.
 
 # Endpoints disponibles
-- `GET /getTasks` - Obtiene todas las tareas
-- `GET /getGoals` - Obtiene todas las metas
-- `POST /addTask` - Añade una nueva tarea
+- `GET /tasks/getTasks` - Obtiene todas las tareas
+- `GET /goals/getGoals` - Obtiene todas las metas
+- `POST /tasks/addTask` - Añade una nueva tarea
 parametros body:
   - `title`: Título de la tarea
   - `dueDate`: Fecha de vencimiento de la tarea
-- `POST /addGoal` - Añade una nueva meta
+- `POST /goals/addGoal` - Añade una nueva meta
 parametros body:
   - `title`: Título de la tarea
   - `dueDate`: Fecha de vencimiento de la tarea
-- `POST /removeTask/:id` - Elimina una tarea
+- `POST /tasks/removeTask/:id` - Elimina una tarea
 parametros head:
   - `id`: ID de la tarea a eliminar
-- `POST /removeGoal/:id` - Elimina una meta
+- `POST /goals/removeGoal/:id` - Elimina una meta
 parametros head:
   - `id`: ID de la meta a eliminar
-- 
 
 ## Frontend
 

@@ -2,11 +2,28 @@
 import express from 'express';
 // Importamos dotenv para gestionar las variables de entorno
 import dotenv from 'dotenv';
+// Importamos path para manejar rutas
+import path from 'path';
+import { fileURLToPath } from 'url';
+// Importamos los routers para las tareas y metas
+import indexRouter from '../routes/index.js';
+import tasksRouter from '../routes/tasks.js';
+import goalsRouter from '../routes/goals.js';
+
+// Configuración para __dirname en ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Cargamos las variables de entorno del archivo .env
 dotenv.config();
 
 // Creamos una instancia de la aplicación Express
 const app = express();
+
+// Configuración del motor de vistas
+app.set('views', path.join(__dirname, '../views'));
+app.set('view engine', 'pug');
+
 // Definimos el puerto donde se ejecutará el servidor, usando una variable de entorno o 3000 por defecto
 const PORT = process.env.PORT || 3000;
 // Obtenemos la clave secreta desde las variables de entorno
@@ -34,105 +51,12 @@ function apiKeyAuth(req, res, next) {
     next();
 }
 
-// Aplicamos el middleware de autenticación a todas las rutas
-app.use(apiKeyAuth);
+// ───── Rutas ─────
+app.use('/', indexRouter); // Ruta principal de la API sin protección
 
-// ───── Almacenamiento en memoria ─────
-// Array para almacenar las tareas en memoria
-let tasks = [];  // { id, title, dueDate }
-// Array para almacenar las metas en memoria
-let goals = [];  // { id, title, dueDate }
-// Contador para generar IDs únicos para tareas y metas
-let counter_tasks = 1;  // para IDs simples en memoria
-let counter_goals = 1;   // para IDs simples en memoria
-
-// ───── Endpoints GET ─────
-// Endpoint para obtener todas las tareas
-app.get('/getTasks', (req, res) => res.json(tasks));
-// Endpoint para obtener todas las metas
-app.get('/getGoals', (req, res) => res.json(goals));
-
-// ───── Endpoints POST ─────
-/**
- * Endpoint para añadir una nueva tarea
- * Espera recibir título y fecha límite en el cuerpo de la solicitud
- */
-app.post('/addTask', (req, res) => {
-    // Extraemos el título y la fecha límite del cuerpo de la solicitud
-    const { title, dueDate } = req.body;
-    // Creamos un nuevo objeto de tarea con un ID único
-    const newTask = { id: counter_tasks++, title, dueDate };
-    // Añadimos la nueva tarea al array de tareas
-    tasks.push(newTask);
-    // Respondemos con la tarea creada y un código de estado 201 (creado)
-    res.status(201).json(newTask);
-});
-
-/**
- * Endpoint para añadir una nueva meta
- * Espera recibir título y fecha límite en el cuerpo de la solicitud
- */
-app.post('/addGoal', (req, res) => {
-    // Extraemos el título y la fecha límite del cuerpo de la solicitud
-    const { title, dueDate } = req.body;
-    // Creamos un nuevo objeto de meta con un ID único
-    const newGoal = { id: counter_goals++, title, dueDate };
-    // Añadimos la nueva meta al array de metas
-    goals.push(newGoal);
-    // Respondemos con la meta creada y un código de estado 201 (creado)
-    res.status(201).json(newGoal);
-});
-
-// ───── Endpoints DELETE (por ?id=) ─────
-/**
- * Endpoint para eliminar una tarea por su ID
- * El ID se proporciona como parámetro de consulta en la URL
- */
-app.delete('/removeTask/:id', (req, res) => {
-    // Obtenemos el ID de los parámetros de ruta
-    const { id } = req.params;
-
-    if (!id) {
-        return res.status(400).json({ error: 'ID is required' });
-    }
-
-    // Verificamos si la tarea existe antes de eliminarla
-    const taskExists = tasks.some(t => t.id === Number(id));
-    if (!taskExists) {
-        return res.status(404).json({ error: `Task with id ${id} not found` });
-    }
-
-    // Filtramos el array de tareas para eliminar la tarea con el ID especificado
-    tasks = tasks.filter(t => t.id !== Number(id));
-
-    // Respondemos con un mensaje de confirmación
-    res.json({ message: `Task ${id} deleted`, success: true });
-});
-
-/**
- * Endpoint para eliminar una meta por su ID
- * El ID se proporciona como parámetro de consulta en la URL
- */
-app.delete('/removeGoal/:id', (req, res) => {
-    // Obtenemos el ID de los parámetros de ruta
-    const { id } = req.params;
-
-    if (!id) {
-        return res.status(400).json({ error: 'ID is required' });
-    }
-
-    // Verificamos si la meta existe antes de eliminarla
-    const goalExists = goals.some(g => g.id === Number(id));
-    if (!goalExists) {
-        return res.status(404).json({ error: `Goal with id ${id} not found` });
-    }
-
-    // Filtramos el array de metas para eliminar la meta con el ID especificado
-    goals = goals.filter(g => g.id !== Number(id));
-
-    // Respondemos con un mensaje de confirmación
-    res.json({ message: `Goal ${id} deleted`, success: true });
-});
+// Aplicamos el middleware de autenticación solo a las rutas que queremos proteger
+app.use('/tasks', apiKeyAuth, tasksRouter);
+app.use('/goals', apiKeyAuth, goalsRouter);
 
 // ───── Arranque ─────
 // Iniciamos el servidor en el puerto especificado y mostramos un mensaje en la consola

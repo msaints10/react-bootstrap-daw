@@ -1,57 +1,65 @@
 import express from 'express';
+import Goal from '../models/goals.js';
+
 const router = express.Router();
-
-// ───── Almacenamiento en memoria ─────
-// Array para almacenar las metas en memoria
-let goals = [];  // { id, title, dueDate }
-// Contador para generar IDs únicos para tareas y metas
-let counter_goals = 1;   // para IDs simples en memoria
-
 
 // ───── Endpoints GET ─────
 // Endpoint para obtener todas las metas
-router.get('/getGoals', (req, res) => {
+router.get('/getGoals', async (req, res) => {
     try {
+        const goals = await Goal.find().sort({ createdAt: -1 });
         res.status(200).json(goals);
     } catch (error) {
-        res.status(500).json({ error: 'Internal server error', message: error.message });
+        res.status(500).json({ 
+            error: 'Internal server error', 
+            message: error.message 
+        });
     }
 });
 
 // ───── Endpoints POST ─────
 /**
  * Endpoint para añadir una nueva meta
- * Espera recibir título y fecha límite en el cuerpo de la solicitud
+ * Espera recibir name, description y dueDate en el cuerpo de la solicitud
  */
-router.post('/addGoal', (req, res) => {
+router.post('/addGoal', async (req, res) => {
     try {
-        // Extraemos el título y la fecha límite del cuerpo de la solicitud
-        const { title, dueDate } = req.body;
+        // Extraemos los datos del cuerpo de la solicitud
+        const { name, description, dueDate } = req.body;
 
         // Verificamos si se proporcionaron todos los campos requeridos
-        if (!title || !dueDate) {
-            return res.status(400).json({ 
-                error: 'Title and dueDate are required fields'
+        if (!name || !description || !dueDate) {
+            return res.status(400).json({
+                error: 'Name, description and dueDate are required fields'
             });
         }
 
-        // Creamos un nuevo objeto de meta con un ID único
-        const newGoal = { id: counter_goals++, title, dueDate };
-        // Añadimos la nueva meta al array de metas
-        goals.push(newGoal);
+        // Creamos una nueva meta usando el modelo
+        const newGoal = new Goal({
+            name,
+            description,
+            dueDate: new Date(dueDate)
+        });
+
+        // Guardamos la meta en la base de datos
+        const savedGoal = await newGoal.save();
+        
         // Respondemos con la meta creada y un código de estado 201 (creado)
-        res.status(201).json(newGoal);
+        res.status(201).json(savedGoal);
     } catch (error) {
-        res.status(500).json({ error: 'Internal server error', message: error.message });
+        res.status(500).json({ 
+            error: 'Internal server error', 
+            message: error.message 
+        });
     }
 });
 
-// ───── Endpoints DELETE (por ?id=) ─────
+// ───── Endpoints DELETE ─────
 /**
  * Endpoint para eliminar una meta por su ID
- * El ID se proporciona como parámetro de consulta en la URL
+ * El ID se proporciona como parámetro de ruta en la URL
  */
-router.delete('/removeGoal/:id', (req, res) => {
+router.delete('/removeGoal/:id', async (req, res) => {
     try {
         // Obtenemos el ID de los parámetros de ruta
         const { id } = req.params;
@@ -60,19 +68,26 @@ router.delete('/removeGoal/:id', (req, res) => {
             return res.status(400).json({ error: 'ID is required' });
         }
 
-        // Verificamos si la meta existe antes de eliminarla
-        const goalExists = goals.some(g => g.id === Number(id));
-        if (!goalExists) {
-            return res.status(404).json({ error: `Goal with id ${id} not found` });
+        // Buscamos y eliminamos la meta por ID
+        const deletedGoal = await Goal.findByIdAndDelete(id);
+
+        if (!deletedGoal) {
+            return res.status(404).json({ 
+                error: `Goal with id ${id} not found` 
+            });
         }
 
-        // Filtramos el array de metas para eliminar la meta con el ID especificado
-        goals = goals.filter(g => g.id !== Number(id));
-
         // Respondemos con un mensaje de confirmación
-        res.json({ message: `Goal ${id} deleted`, success: true });
+        res.json({ 
+            message: `Goal ${id} deleted successfully`, 
+            success: true,
+            deletedGoal 
+        });
     } catch (error) {
-        res.status(500).json({ error: 'Internal server error', message: error.message });
+        res.status(500).json({ 
+            error: 'Internal server error', 
+            message: error.message 
+        });
     }
 });
 

@@ -1,17 +1,13 @@
 import express from 'express';
+import Task from '../models/tasks.js';
+
 const router = express.Router();
-
-// ───── Almacenamiento en memoria ─────
-// Array para almacenar las tareas en memoria
-let tasks = [];  // { id, title, dueDate }
-// Contador para generar IDs únicos para tareas y metas
-let counter_tasks = 1;  // para IDs simples en memoria
-
 
 // ───── Endpoints GET ─────
 // Endpoint para obtener todas las tareas
-router.get('/getTasks', (req, res) => {
+router.get('/getTasks', async (req, res) => {
     try {
+        const tasks = await Task.find().sort({ createdAt: -1 });
         res.status(200).json(tasks);
     } catch (error) {
         res.status(500).json({
@@ -24,24 +20,32 @@ router.get('/getTasks', (req, res) => {
 // ───── Endpoints POST ─────
 /**
  * Endpoint para añadir una nueva tarea
- * Espera recibir título y fecha límite en el cuerpo de la solicitud
+ * Espera recibir name, description y dueDate en el cuerpo de la solicitud
  */
-router.post('/addTask', (req, res) => {
+router.post('/addTask', async (req, res) => {
     try {
-        // Extraemos el título y la fecha límite del cuerpo de la solicitud
-        const { title, dueDate } = req.body;
+        // Extraemos los datos del cuerpo de la solicitud
+        const { name, description, dueDate } = req.body;
 
-        // Verificamos que se proporcionen tanto el título como la fecha límite
-        if (!title || !dueDate) {
-            return res.status(400).json({ error: 'Title and dueDate are required' });
+        // Verificamos que se proporcionen todos los campos requeridos
+        if (!name || !description || !dueDate) {
+            return res.status(400).json({ 
+                error: 'Name, description and dueDate are required' 
+            });
         }
 
-        // Creamos un nuevo objeto de tarea con un ID único
-        const newTask = { id: counter_tasks++, title, dueDate };
-        // Añadimos la nueva tarea al array de tareas
-        tasks.push(newTask);
+        // Creamos una nueva tarea usando el modelo
+        const newTask = new Task({
+            name,
+            description,
+            dueDate: new Date(dueDate)
+        });
+
+        // Guardamos la tarea en la base de datos
+        const savedTask = await newTask.save();
+        
         // Respondemos con la tarea creada y un código de estado 201 (creado)
-        res.status(201).json(newTask);
+        res.status(201).json(savedTask);
     } catch (error) {
         res.status(500).json({ 
             error: 'Internal server error', 
@@ -50,12 +54,12 @@ router.post('/addTask', (req, res) => {
     }
 });
 
-// ───── Endpoints DELETE (por ?id=) ─────
+// ───── Endpoints DELETE ─────
 /**
  * Endpoint para eliminar una tarea por su ID
- * El ID se proporciona como parámetro de consulta en la URL
+ * El ID se proporciona como parámetro de ruta en la URL
  */
-router.delete('/removeTask/:id', (req, res) => {
+router.delete('/removeTask/:id', async (req, res) => {
     try {
         // Obtenemos el ID de los parámetros de ruta
         const { id } = req.params;
@@ -64,17 +68,21 @@ router.delete('/removeTask/:id', (req, res) => {
             return res.status(400).json({ error: 'ID is required' });
         }
 
-        // Verificamos si la tarea existe antes de eliminarla
-        const taskExists = tasks.some(t => t.id === Number(id));
-        if (!taskExists) {
-            return res.status(404).json({ error: `Task with id ${id} not found` });
+        // Buscamos y eliminamos la tarea por ID
+        const deletedTask = await Task.findByIdAndDelete(id);
+
+        if (!deletedTask) {
+            return res.status(404).json({ 
+                error: `Task with id ${id} not found` 
+            });
         }
 
-        // Filtramos el array de tareas para eliminar la tarea con el ID especificado
-        tasks = tasks.filter(t => t.id !== Number(id));
-
         // Respondemos con un mensaje de confirmación
-        res.json({ message: `Task ${id} deleted`, success: true });
+        res.json({ 
+            message: `Task ${id} deleted successfully`, 
+            success: true,
+            deletedTask 
+        });
     } catch (error) {
         res.status(500).json({ 
             error: 'Internal server error', 

@@ -26,12 +26,25 @@ cd backend
 npm install
 ```
 
-3. Generar clave secreta:
+3. Configurar variables de entorno:
+```bash
+# Copiar el archivo de ejemplo
+Copy-Item .env.example .env
+
+# O en sistemas Unix/Linux/Mac:
+# cp .env.example .env
+```
+
+4. Generar clave secreta:
 ```bash
 cd utils
 node create_secretkey.js
 cd ..
 ```
+
+5. Actualizar el archivo `.env` con los valores apropiados:
+   - Copia la clave secreta generada y reemplaza `tu_clave_secreta_aqui` en la variable `SECRET_KEY`
+   - Configura tu URL de MongoDB en `MONGODB_URI` si usas una instancia diferente
 
 ### Ejecutar el Proyecto Backend
 
@@ -55,18 +68,20 @@ Se debe de incluir el Authorization en el header de la petición. Debe ser igual
 - `GET /tasks/getTasks` - Obtiene todas las tareas
 - `GET /goals/getGoals` - Obtiene todas las metas
 - `POST /tasks/addTask` - Añade una nueva tarea
-parametros body:
-  - `title`: Título de la tarea
+Parámetros body:
+  - `name`: Nombre de la tarea
+  - `description`: Descripción de la tarea
   - `dueDate`: Fecha de vencimiento de la tarea
 - `POST /goals/addGoal` - Añade una nueva meta
-parametros body:
-  - `title`: Título de la tarea
-  - `dueDate`: Fecha de vencimiento de la tarea
-- `POST /tasks/removeTask/:id` - Elimina una tarea
-parametros head:
+Parámetros body:
+  - `name`: Nombre de la meta
+  - `description`: Descripción de la meta
+  - `dueDate`: Fecha de vencimiento de la meta
+- `DELETE /tasks/removeTask/:id` - Elimina una tarea
+Parámetros URL:
   - `id`: ID de la tarea a eliminar
-- `POST /goals/removeGoal/:id` - Elimina una meta
-parametros head:
+- `DELETE /goals/removeGoal/:id` - Elimina una meta
+Parámetros URL:
   - `id`: ID de la meta a eliminar
 
 ## Frontend

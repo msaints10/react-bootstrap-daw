@@ -1,49 +1,141 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { RootState } from "../store"
 
 interface Goal {
-    id: number;
+    _id: string;
     name: string;
-    complete: boolean;
+    description: string;
+    dueDate: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 interface GoalsState {
-    value: Goal[]
+    goals: Goal[];
+    loading: boolean;
+    error: string | null;
 }
 
-const initialState: GoalsState = {
-    value: [
-        {
-            id: 1,
-            name: 'Graduarme de la Universidad',
-            complete: false
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+const API_KEY = import.meta.env.VITE_API_KEY || "02f080a9e5b81c8a23c0e82ab19b4a3e31ef9b9dd0c7c51ab4af82f3d49b10c9";
+
+// Acciones asíncronas
+export const fetchGoals = createAsyncThunk(
+    'goals/fetchGoals',
+    async () => {
+        const response = await fetch(`${API_BASE_URL}/goals/getGoals`, {
+            headers: {
+                'Authorization': API_KEY
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Error fetching goals');
         }
-    ],
+        
+        return response.json();
+    }
+);
+
+export const addGoalAsync = createAsyncThunk(
+    'goals/addGoal',
+    async (goalData: { name: string; description: string; dueDate: string }) => {
+        const response = await fetch(`${API_BASE_URL}/goals/addGoal`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': API_KEY
+            },
+            body: JSON.stringify(goalData)
+        });
+
+        if (!response.ok) {
+            throw new Error('Error adding goal');
+        }
+
+        return response.json();
+    }
+);
+
+export const deleteGoalAsync = createAsyncThunk(
+    'goals/deleteGoal',
+    async (goalId: string) => {
+        const response = await fetch(`${API_BASE_URL}/goals/removeGoal/${goalId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': API_KEY
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Error deleting goal');
+        }
+
+        return goalId;
+    }
+);
+
+const initialState: GoalsState = {
+    goals: [],
+    loading: false,
+    error: null,
 }
 
 export const goalSlice = createSlice({
     name: 'goals',
     initialState,
     reducers: {
-        addGoal: (state, action: PayloadAction<{ name: string }>) => {
-            state.value.push({
-                id: state.value.length + 1,
-                name: action.payload.name,
-                complete: false
-            })
-        },
-        removeGoal: (state, action: PayloadAction<number>) => {
-            state.value = state.value.filter((goal) => goal.id !== action.payload);
-        },
-        toggleGoal: (state, action: PayloadAction<number>) => {
-            const goal = state.value.find(goal => goal.id === action.payload);
-            if (goal) {
-                goal.complete = !goal.complete;
-            }
+        clearError: (state) => {
+            state.error = null;
         }
+    },
+    extraReducers: (builder) => {
+        builder
+            // Fetch goals
+            .addCase(fetchGoals.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchGoals.fulfilled, (state, action) => {
+                state.loading = false;
+                state.goals = action.payload;
+            })
+            .addCase(fetchGoals.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || 'Error loading goals';
+            })
+            // Add goal
+            .addCase(addGoalAsync.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(addGoalAsync.fulfilled, (state, action) => {
+                state.loading = false;
+                state.goals.unshift(action.payload);
+            })
+            .addCase(addGoalAsync.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || 'Error adding goal';
+            })
+            // Delete goal
+            .addCase(deleteGoalAsync.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(deleteGoalAsync.fulfilled, (state, action) => {
+                state.loading = false;
+                state.goals = state.goals.filter(goal => goal._id !== action.payload);
+            })
+            .addCase(deleteGoalAsync.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || 'Error deleting goal';
+            });
     }
 })
-export const { addGoal, removeGoal, toggleGoal } = goalSlice.actions
-export const selectGoals = (state: RootState) => state.goals.value
+
+export const { clearError } = goalSlice.actions
+export const selectGoals = (state: RootState) => state.goals.goals
+export const selectGoalsLoading = (state: RootState) => state.goals.loading
+export const selectGoalsError = (state: RootState) => state.goals.error
 
 export default goalSlice.reducer

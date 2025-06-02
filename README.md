@@ -37,9 +37,7 @@ Copy-Item .env.example .env
 
 4. Generar clave secreta:
 ```bash
-cd utils
-node create_secretkey.js
-cd ..
+npm run generate-key
 ```
 
 5. Actualizar el archivo `.env` con los valores apropiados:
@@ -146,4 +144,27 @@ export default tseslint.config({
     'react-dom': reactDom,
   }
 })
+```
+
+## 🐳 Docker
+
+### Ejecución Simple
+
+```bash
+# 1. Configurar MongoDB Atlas
+copy .env.example .env
+# Editar .env con tu connection string
+
+# 2. Ejecutar
+docker-compose up --build
+
+# 3. Acceder
+# http://localhost:4000
+```
+
+### Variables de Entorno (.env)
+
+```bash
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/react_bootstrap_daw
+SECRET_KEY=tu_clave_secreta
 ```

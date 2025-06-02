@@ -1,50 +1,21 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Formulario from "./components/Formulario/Formulario";
-import Item from "./components/Item/Item";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Menu from "./components/Menu/Menu";
-import { initAddTodo } from "./reducers/todoSlice";
-import { RootState } from "./store";
+import HomePage from "./pages/HomePage";
+import TasksPage from "./pages/TasksPage";
+import GoalsPage from "./pages/GoalsPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
-  const dispatch = useDispatch();
-  const todos = useSelector((state: RootState) => state.todos.value);
-
-  const initialTodos = [
-    {
-      id: 1,
-      name: "caminar al perro 1",
-      complete: false,
-    },
-    {
-      id: 2,
-      name: "caminar al perro 2",
-      complete: false,
-    },
-  ];
-
-  useEffect(() => {
-    initialTodos.forEach((todo) => {
-      dispatch(initAddTodo(todo));
-    });
-  }, [dispatch]); // Agregamos dispatch como dependencia
-
   return (
-    <>
+    <Router>
       <Menu />
-      <div className="container p-5">
-        <div className="row">
-          <div className="col-12 col-md-6 col-lg-8">
-            <Formulario />
-          </div>
-          <div className="col-12 col-md-6 col-lg-4">
-            {todos.map((todo) => (
-              <Item key={todo.id} id={todo.id} name={todo.name} />
-            ))}
-          </div>
-        </div>
-      </div>
-    </>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/tasks" element={<TasksPage />} />
+        <Route path="/goals" element={<GoalsPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </Router>
   );
 }
 

@@ -18,6 +18,8 @@ import tasksRouter from '../routes/tasks.js';
 import goalsRouter from '../routes/goals.js';
 // Importamos la conexión a la base de datos
 import connectDB from '../config/db.js';
+// Importamos el paquete cors
+import cors from 'cors';
 
 // Configuración para __dirname en ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -30,13 +32,13 @@ dotenv.config();
 const app = express();
 // ───── Configuración del servidor ─────
 // Configuración de CORS para permitir solicitudes desde el frontend
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*'); // Permitir todas las solicitudes de origen
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS'); // Métodos permitidos
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization'); // Encabezados permitidos
-    next(); // Continuar con la siguiente función middleware
-});
-// ───── Configuración del servidor ─────
+const corsOptions = {
+    origin: process.env.FRONTEND_URL || '*', // Permitir solicitudes desde la URL del frontend
+    methods: 'GET,POST,PUT,DELETE,OPTIONS', // Métodos permitidos
+    allowedHeaders: 'Content-Type,Authorization', // Encabezados permitidos
+};
+app.use(cors(corsOptions));
+
 // Configuración de morgan para registrar las solicitudes HTTP en la consola
 app.use(morgan('dev')); // Registrar solicitudes HTTP en modo desarrollo
 app.use(cookieParser()); // Middleware para parsear cookies

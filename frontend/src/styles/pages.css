@@ -1,0 +1,50 @@
+/* Estilos para las páginas */
+.hover-card {
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef !important;
+}
+
+.hover-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.page-icon {
+  font-size: 3.5rem;
+}
+
+.icon-tasks {
+  color: #0d6efd;
+}
+
+.icon-goals {
+  color: #198754;
+}
+
+.icon-error {
+  color: #dc3545;
+}
+
+.action-button {
+  transition: all 0.2s ease;
+}
+
+.action-button:hover {
+  transform: scale(1.02);
+}
+
+/* Animaciones suaves para las transiciones de página */
+.page-container {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

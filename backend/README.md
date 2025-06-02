@@ -32,9 +32,7 @@ cp .env.example .env
 
 4. **Generar clave secreta:**
 ```bash
-cd utils
-node create_secretkey.js
-cd ..
+npm run generate-key
 ```
 
 5. **Configurar el archivo `.env`:**
@@ -161,8 +159,9 @@ El proyecto utiliza MongoDB con Mongoose como ODM. Las colecciones creadas son:
 ## 🔧 Scripts disponibles
 
 ```bash
-npm run dev    # Ejecutar en modo desarrollo con nodemon
-npm start      # Ejecutar en modo producción
+npm run dev          # Ejecutar en modo desarrollo con nodemon
+npm start            # Ejecutar en modo producción
+npm run generate-key # Generar clave secreta automáticamente
 ```
 
 ## 📁 Estructura del proyecto
